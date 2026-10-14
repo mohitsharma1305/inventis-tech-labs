@@ -1,0 +1,62 @@
+[
+  {
+    "id": "bench-01",
+    "title": "Fake Electricity Disconnection Scam",
+    "category": "Utility Scam (Urgency & Coercion)",
+    "channel": "sms",
+    "expected_risk": "CRITICAL",
+    "description": "Exploits fear of sudden power cut, impersonates electricity board, and drives payment to a phishing portal.",
+    "sample_text": "Dear consumer, your electricity power will be disconnected tonight at 9:30 PM from power office because your previous month bill was not updated. Please immediately contact our officer at 88234-XXXXX or pay via http://bijli-bill-update.online/pay",
+    "sample_url": "http://bijli-bill-update.online/pay"
+  },
+  {
+    "id": "bench-02",
+    "title": "SBI YONO Fake KYC Deactivation",
+    "category": "Banking Phishing (Typosquatting & Threat)",
+    "channel": "sms",
+    "expected_risk": "CRITICAL",
+    "description": "Classic Indian smishing template targeting SBI customers using panic over suspended PAN/Aadhaar status.",
+    "sample_text": "Dear customer, your SBI YONO account has been suspended due to pending PAN/Aadhaar KYC. Click here immediately to update: http://onlinesbi-yono-kyc.top/verify. Do not ignore.",
+    "sample_url": "http://onlinesbi-yono-kyc.top/verify"
+  },
+  {
+    "id": "bench-03",
+    "title": "SKIT Campus Exam Admit Card Fee Fraud",
+    "category": "Smart Campus Fraud (Authority Impersonation)",
+    "channel": "email",
+    "expected_risk": "CRITICAL",
+    "description": "Targets engineering college students with fake debarment threats for immediate fee extortion.",
+    "sample_text": "Urgent Notice: RTU & SKIT Semester Examination admit card registration closes in 2 hours. Pay pending late fine of Rs 500 to avoid debarment at: http://skit-exam-portal.live/fee",
+    "sample_url": "http://skit-exam-portal.live/fee"
+  },
+  {
+    "id": "bench-04",
+    "title": "Part-Time Review Job Investment Trap",
+    "category": "Social Media Job Scam (Greed & Reward)",
+    "channel": "social",
+    "expected_risk": "CRITICAL",
+    "description": "WhatsApp/Telegram phishing luring youth with unrealistic daily income promises.",
+    "sample_text": "Congratulations! You are selected for part-time Amazon product review job. Earn Rs. 3,000 to Rs. 8,000 daily from home. Join official manager telegram: http://t.me/earn_daily_job",
+    "sample_url": "http://t.me/earn_daily_job"
+  },
+  {
+    "id": "bench-05",
+    "title": "Genuine Bank Transaction OTP",
+    "category": "Legitimate Bank Message (Zero False Positive)",
+    "channel": "sms",
+    "expected_risk": "SAFE",
+    "description": "Proves the system does not produce false positives on real transactional alerts containing security warnings.",
+    "sample_text": "OTP for transaction of Rs. 4,500 at Amazon India is 849201. Valid for 10 mins. Do not share OTP with anyone - State Bank of India.",
+    "sample_url": null
+  },
+  {
+    "id": "bench-06",
+    "title": "Official SKIT Academic Circular",
+    "category": "Legitimate Campus Notice (Zero False Positive)",
+    "channel": "email",
+    "expected_risk": "SAFE",
+    "description": "Proves benign academic communications are correctly classified as Safe.",
+    "sample_text": "All 3rd year B.Tech students are informed that IEEE-IGNITE Hackathon orientation will be held in the Mini Auditorium at 2:00 PM today. Principal, SKIT Jaipur.",
+    "sample_url": null
+  }
+]
