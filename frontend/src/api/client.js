@@ -1,5 +1,5 @@
 /**
- * PhishGuard AI API Client with resilient offline fallback
+ * Inventis Threat Defense API Client with resilient offline fallback
  */
 
 const API_BASE = '/api';

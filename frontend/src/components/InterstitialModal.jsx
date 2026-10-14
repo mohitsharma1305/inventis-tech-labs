@@ -9,8 +9,14 @@ export default function InterstitialModal({ isOpen, onClose, result }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="interstitial-card" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-top-brand">
+          <div className="modal-brand-pill">
+            <img src="/logoandname.png" alt="Inventis Safety Shield" className="modal-brand-img" />
+          </div>
+        </div>
+
         <div className="interstitial-shield">
-          <AlertOctagon size={36} strokeWidth={2.2} />
+          <img src="/logo.png" alt="Inventis Intercept Shield" className="modal-shield-logo" />
         </div>
 
         <div>

@@ -16,16 +16,28 @@ import {
 export default function AnalysisResult({ result, onOpenInterstitial }) {
   if (!result) {
     return (
-      <div className="result-section glass-panel" style={{ textAlign: 'center', padding: '60px 24px' }}>
-        <div style={{ color: 'var(--text-muted)', marginBottom: '14px' }}>
-          <ShieldAlert size={48} strokeWidth={1.5} style={{ opacity: 0.4, margin: '0 auto' }} />
+      <div className="result-section glass-panel ready-state-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+        <div className="ready-brand-container">
+          <div className="ready-brand-pill">
+            <img src="/logoandname.png" alt="Inventis Detection Engine" className="ready-brand-img" />
+          </div>
         </div>
-        <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--text-secondary)' }}>
-          Awaiting Inspection Request
+        <h3 style={{ fontFamily: 'var(--font-display)', color: '#fff', fontSize: '1.25rem', marginTop: '16px', fontWeight: 700 }}>
+          Inventis Engine Ready
         </h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '340px', margin: '8px auto 0' }}>
-          Paste a message above or pick one of the IEEE-IGNITE test presets to trigger the hybrid detection pipeline.
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '380px', margin: '8px auto 0' }}>
+          Paste suspect content on the left or select an IEEE-IGNITE test preset to trigger real-time AI linguistic, URL entropy, and brand impersonation analysis.
         </p>
+        <div className="ready-state-badges">
+          <span className="ready-badge">
+            <img src="/logo.png" alt="Emblem" className="ready-badge-icon" />
+            <span>Sub-millisecond NLP Engine</span>
+          </span>
+          <span className="ready-badge">
+            <img src="/logo.png" alt="Emblem" className="ready-badge-icon" />
+            <span>Shannon Entropy Scanner</span>
+          </span>
+        </div>
       </div>
     );
   }

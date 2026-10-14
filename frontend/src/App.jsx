@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import DynamicRadarCard from './components/DynamicRadarCard';
 import BenchmarkSelector from './components/BenchmarkSelector';
 import Scanner from './components/Scanner';
 import AnalysisResult from './components/AnalysisResult';
+import BottomGrid from './components/BottomGrid';
 import InterstitialModal from './components/InterstitialModal';
 import CaseHistory from './components/CaseHistory';
 import Dashboard from './components/Dashboard';
@@ -13,6 +15,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('analyze');
   const [backendStatus, setBackendStatus] = useState(null);
   const [benchmarks, setBenchmarks] = useState([]);
+  const [presetIndex, setPresetIndex] = useState(0);
 
   // Scanner state
   const [inputText, setInputText] = useState('');
@@ -65,6 +68,13 @@ export default function App() {
     handleRunAnalysis(bench.sample_text, bench.sample_url || '', bench.channel);
   };
 
+  const handleQuickPreset = () => {
+    if (!benchmarks || benchmarks.length === 0) return;
+    const nextIdx = (presetIndex + 1) % benchmarks.length;
+    setPresetIndex(nextIdx);
+    handleSelectBenchmark(benchmarks[nextIdx]);
+  };
+
   const handleSelectCaseFromHistory = (historyRow) => {
     setInputText(historyRow.preview);
     setInputUrl(historyRow.url || '');
@@ -75,23 +85,36 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Header & Navigation */}
+      {/* Top Navbar Matching Screenshot */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         backendStatus={backendStatus}
+        onQuickPreset={handleQuickPreset}
       />
 
       {/* Main Tab Routing */}
       {activeTab === 'analyze' && (
         <>
-          {/* 1-Click Test Scenarios for Hackathon Presentation */}
+          {/* Flagship Dynamic Radar Cockpit (Matching Dark Hero Card in Screenshot) */}
+          <DynamicRadarCard
+            result={result}
+            totalScans={65}
+            criticalCount={3}
+            suspiciousCount={2}
+            safeCount={5}
+            onOpenInterstitial={() => setIsModalOpen(true)}
+            onSelectBenchmark={handleSelectBenchmark}
+            benchmarks={benchmarks}
+          />
+
+          {/* 1-Click Demonstration Scenarios Presets Bar */}
           <BenchmarkSelector
             benchmarks={benchmarks}
             onSelectBenchmark={handleSelectBenchmark}
           />
 
-          {/* Scanner & Real-Time Intelligence View */}
+          {/* Scanner Console & XAI Intelligence View */}
           <div className="scanner-grid">
             <Scanner
               inputText={inputText}
@@ -110,22 +133,63 @@ export default function App() {
               onOpenInterstitial={() => setIsModalOpen(true)}
             />
           </div>
+
+          {/* 4 Bottom Sage Cards & Timeline Strip (Matching Bottom Grid in Screenshot) */}
+          <BottomGrid
+            onOpenTimeline={() => setActiveTab('history')}
+            onTriggerAutomation={(type) => {
+              if (type === 'playbooks') setIsModalOpen(true);
+              else handleQuickPreset();
+            }}
+          />
         </>
       )}
 
       {activeTab === 'history' && (
-        <CaseHistory onSelectCase={handleSelectCaseFromHistory} />
+        <>
+          <CaseHistory onSelectCase={handleSelectCaseFromHistory} />
+          <BottomGrid
+            onOpenTimeline={() => setActiveTab('history')}
+            onTriggerAutomation={() => handleQuickPreset()}
+          />
+        </>
       )}
 
       {activeTab === 'dashboard' && (
-        <Dashboard />
+        <>
+          <DynamicRadarCard
+            result={result}
+            onOpenInterstitial={() => setIsModalOpen(true)}
+          />
+          <Dashboard />
+          <BottomGrid
+            onOpenTimeline={() => setActiveTab('history')}
+            onTriggerAutomation={() => handleQuickPreset()}
+          />
+        </>
       )}
 
-      {activeTab === 'research' && (
-        <AcademicDocs />
-      )}
 
-      {/* Pre-Interaction Protective Modal (SKIT025 Key Requirement) */}
+      {/* Global Application Footer */}
+      <footer className="app-footer">
+        <div className="footer-content">
+          <div className="footer-brand-lockup">
+            <div className="footer-logo-pill">
+              <img src="/logoandname.png" alt="Inventis" className="footer-logo-img" />
+            </div>
+            <span className="brand-tag-skit">SKIT025</span>
+          </div>
+          <p className="footer-text">
+            Inventis — IEEE-IGNITE Hackathon | Swami Keshvanand Institute of Technology, Jaipur
+          </p>
+          <div className="footer-security-status">
+            <img src="/logo.png" alt="Shield Emblem" className="footer-emblem-mini" />
+            <span>Dual-Framework Threat Defense Pipeline Active</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Pre-Interaction Protective Modal (SKIT025 Interstitial Shield) */}
       <InterstitialModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -32,7 +32,7 @@ export default function CaseHistory({ onSelectCase }) {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history, null, 2));
     const dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", `phishguard_audit_log_${Date.now()}.json`);
+    dlAnchorElem.setAttribute("download", `inventis_audit_log_${Date.now()}.json`);
     dlAnchorElem.click();
   };
 

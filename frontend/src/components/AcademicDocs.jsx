@@ -57,16 +57,21 @@ export default function AcademicDocs() {
 
   return (
     <div className="glass-panel" style={{ padding: '28px' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Award size={24} color="var(--accent-cyan)" />
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 700 }}>
-            Academic Literature & Grounding (IEEE-IGNITE SKIT025)
-          </h2>
+      <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Award size={24} color="var(--accent-cyan)" />
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 700 }}>
+              Academic Literature & Grounding (IEEE-IGNITE SKIT025)
+            </h2>
+          </div>
+          <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            Every detection engine and scoring formula in Inventis is backed by authentic, peer-reviewed academic research.
+          </p>
         </div>
-        <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-          Every detection engine and scoring formula in PhishGuard AI is backed by authentic, peer-reviewed academic research.
-        </p>
+        <div className="research-brand-pill">
+          <img src="/logoandname.png" alt="Inventis Research" className="research-brand-img" />
+        </div>
       </div>
 
       {/* Mathematical Formulation Banner */}

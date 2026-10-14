@@ -30,7 +30,7 @@ from .engine.xai_explainer import generate_explanation_and_guidance
 from .database import init_db, save_case, search_cases, get_dashboard_metrics
 
 app = FastAPI(
-    title="PhishGuard AI — Multi-Vector Threat Defense Platform",
+    title="Inventis — Multi-Vector Threat Defense Platform",
     description="AI-driven Phishing, Scam, and Malicious URL Detection Engine (IEEE-IGNITE SKIT025)",
     version="1.0.0"
 )
@@ -52,7 +52,7 @@ def on_startup():
 def health_check():
     return {
         "status": "online",
-        "service": "PhishGuard AI Backend",
+        "service": "Inventis Backend",
         "version": "1.0.0",
         "models_loaded": classifier_instance.model is not None
     }

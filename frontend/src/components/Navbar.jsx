@@ -1,67 +1,88 @@
 import React from 'react';
-import { Shield, Activity, Search, BarChart3, BookOpen, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Eye, Mail, LayoutGrid, ShieldAlert, Sparkles } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, backendStatus }) {
+export default function Navbar({ activeTab, setActiveTab, backendStatus, onQuickPreset }) {
   const isOnline = backendStatus?.status === 'online';
 
   return (
-    <nav className="navbar glass-panel">
-      <div className="brand-wrapper">
-        <div className="brand-icon">
-          <Shield size={26} strokeWidth={2.2} />
+    <nav className="cyberguard-navbar">
+      {/* Brand Section: Full Name and Logo on White Background */}
+      <div className="brand-group" onClick={() => setActiveTab('analyze')}>
+        <div className="brand-white-pill">
+          <img src="/logoandname.png" alt="Inventis" className="brand-logoandname-img" />
         </div>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="brand-title">PhishGuard AI</span>
-            <span className="brand-tag">SKIT025</span>
-          </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            IEEE-IGNITE Hackathon | Hybrid Phishing & URL Defense
-          </p>
-        </div>
+        <span className="brand-tag-skit">SKIT025</span>
       </div>
 
-      <div className="nav-links">
+      {/* Center Navigation Pills (Restored original names, Executions removed) */}
+      <div className="center-nav-pills">
         <button
-          id="nav-scanner-btn"
-          className={`nav-btn ${activeTab === 'analyze' ? 'active' : ''}`}
+          id="nav-overview-btn"
+          className={`nav-pill-btn ${activeTab === 'analyze' ? 'active' : ''}`}
           onClick={() => setActiveTab('analyze')}
         >
-          <Activity size={17} />
-          <span>Threat Scanner</span>
+          Threat Scanner
         </button>
 
         <button
-          id="nav-history-btn"
-          className={`nav-btn ${activeTab === 'history' ? 'active' : ''}`}
+          id="nav-alerts-btn"
+          className={`nav-pill-btn ${activeTab === 'history' ? 'active' : ''}`}
           onClick={() => setActiveTab('history')}
         >
-          <Search size={17} />
-          <span>Case History</span>
+          Case History
         </button>
 
         <button
-          id="nav-dashboard-btn"
-          className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+          id="nav-insights-btn"
+          className={`nav-pill-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
           onClick={() => setActiveTab('dashboard')}
         >
-          <BarChart3 size={17} />
-          <span>Security Operations</span>
+          Security Operations
         </button>
 
         <button
-          id="nav-research-btn"
-          className={`nav-btn ${activeTab === 'research' ? 'active' : ''}`}
-          onClick={() => setActiveTab('research')}
+          id="nav-quick-plus-btn"
+          className="nav-pill-plus"
+          title="Quick 1-Click Scenario Preset"
+          onClick={onQuickPreset}
         >
-          <BookOpen size={17} />
-          <span>Research & Papers</span>
+          +
         </button>
       </div>
 
-      <div className="system-status-badge">
-        <span className="pulse-dot" style={{ backgroundColor: isOnline ? 'var(--risk-safe)' : 'var(--risk-suspicious)' }}></span>
-        <span>{isOnline ? 'AI Pipeline Active' : 'Client Resilient Mode'}</span>
+      {/* Right Quick Action Group */}
+      <div className="right-nav-actions">
+        <button
+          id="nav-alerts-table-btn"
+          className="pill-action-btn"
+          onClick={() => setActiveTab('history')}
+        >
+          Alerts Table
+        </button>
+
+        <button
+          className="icon-circle-btn"
+          title={isOnline ? "AI Pipeline Active (Port 8000)" : "Client Mode"}
+          onClick={() => setActiveTab('analyze')}
+        >
+          <Eye size={15} color={isOnline ? '#10b981' : '#ff6b2b'} />
+        </button>
+
+        <button
+          className="icon-circle-btn"
+          title="Security Incidents Mail"
+          onClick={() => setActiveTab('history')}
+        >
+          <Mail size={15} />
+        </button>
+
+        <button
+          className="icon-circle-btn"
+          title="Threat Radar Layout"
+          onClick={() => setActiveTab('dashboard')}
+        >
+          <LayoutGrid size={15} />
+        </button>
       </div>
     </nav>
   );
