@@ -81,3 +81,40 @@ class BenchmarkCase(BaseModel):
     description: str
     sample_text: str
     sample_url: Optional[str] = None
+
+class SandboxFormInput(BaseModel):
+    name: str
+    input_type: str
+    placeholder: Optional[str] = None
+    is_sensitive: bool = False
+
+class SandboxRedirectHop(BaseModel):
+    step: int
+    url: str
+    status_code: int
+
+class SandboxInspectRequest(BaseModel):
+    url: str
+    emulate_device: Optional[str] = "desktop"
+
+class SandboxInspectResponse(BaseModel):
+    id: str
+    target_url: str
+    final_url: str
+    redirect_chain: List[SandboxRedirectHop]
+    http_status: int
+    response_time_ms: int
+    ip_address: str
+    ssl_status: str
+    server_header: str
+    page_title: str
+    detected_forms: List[SandboxFormInput]
+    has_password_field: bool
+    has_otp_field: bool
+    has_card_field: bool
+    download_payloads: List[str]
+    threat_verdict: str
+    risk_score: int
+    verdict_reasons: List[str]
+    safe_preview_html: str
+    logs: List[str]

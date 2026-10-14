@@ -2,15 +2,14 @@ import React from 'react';
 import {
   ArrowUpRight,
   ChevronRight,
-  Server,
-  Cpu,
+  Network,
+  Settings,
   Monitor,
   Laptop,
   Smartphone,
-  Plus,
-  ShieldCheck,
-  AlertTriangle,
-  PlayCircle
+  HardDrive,
+  User,
+  Plus
 } from 'lucide-react';
 
 export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
@@ -21,41 +20,58 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
         {/* Card 1: Sources (with warm rose/coral glow) */}
         <div className="sage-card card-sources">
           <div className="card-top-row">
-            <h3 className="card-title">Sources</h3>
+            <div>
+              <h3 className="card-title">Telemetry Sources</h3>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', display: 'block', marginTop: '2px' }}>
+                Monitored streams & endpoint sensors
+              </span>
+            </div>
             <ArrowUpRight size={16} className="card-arrow" />
           </div>
 
           <div className="sources-list">
             <div className="source-item">
               <div className="source-meta">
-                <span className="source-icon">🖧</span>
+                <span className="source-icon">
+                  <Network size={14} color="var(--text-dark-secondary)" />
+                </span>
                 <span className="source-name">XDR Agent</span>
               </div>
               <div className="source-count-grp">
                 <span className="source-num">37</span>
-                <span className="source-badge">⚙</span>
+                <span className="source-badge">
+                  <Settings size={12} color="var(--text-dark-muted)" />
+                </span>
               </div>
             </div>
 
             <div className="source-item">
               <div className="source-meta">
-                <span className="source-icon">🖥️</span>
+                <span className="source-icon">
+                  <Monitor size={14} color="var(--text-dark-secondary)" />
+                </span>
                 <span className="source-name">XDR Analitics BIOS</span>
               </div>
               <div className="source-count-grp">
                 <span className="source-num">29</span>
-                <span className="source-badge">⚙</span>
+                <span className="source-badge">
+                  <Settings size={12} color="var(--text-dark-muted)" />
+                </span>
               </div>
             </div>
 
             <div className="source-item">
               <div className="source-meta">
-                <span className="source-icon">💾</span>
+                <span className="source-icon">
+                  <HardDrive size={14} color="var(--text-dark-secondary)" />
+                </span>
                 <span className="source-name">XDR BIOS</span>
               </div>
               <div className="source-count-grp">
                 <span className="source-num">18</span>
-                <span className="source-badge">⚙</span>
+                <span className="source-badge">
+                  <Settings size={12} color="var(--text-dark-muted)" />
+                </span>
               </div>
             </div>
           </div>
@@ -71,7 +87,12 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
         {/* Card 2: Alerts (with striped/segmented progress bars) */}
         <div className="sage-card card-alerts">
           <div className="card-top-row">
-            <h3 className="card-title">Alerts</h3>
+            <div>
+              <h3 className="card-title">Alert Breakdown</h3>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', display: 'block', marginTop: '2px' }}>
+                Incidents segmented by threat severity
+              </span>
+            </div>
             <ArrowUpRight size={16} className="card-arrow" />
           </div>
 
@@ -126,7 +147,12 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
         {/* Card 3: Automation */}
         <div className="sage-card card-automation">
           <div className="card-top-row">
-            <h3 className="card-title">Automation</h3>
+            <div>
+              <h3 className="card-title">Automated Playbooks</h3>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', display: 'block', marginTop: '2px' }}>
+                Automated containment & quarantine workflows
+              </span>
+            </div>
             <ArrowUpRight size={16} className="card-arrow" />
           </div>
 
@@ -166,7 +192,12 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
         {/* Card 4: Assets */}
         <div className="sage-card card-assets">
           <div className="card-top-row">
-            <h3 className="card-title">Assets</h3>
+            <div>
+              <h3 className="card-title">Monitored Endpoints</h3>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)', display: 'block', marginTop: '2px' }}>
+                Connected workstation and user devices
+              </span>
+            </div>
             <ArrowUpRight size={16} className="card-arrow" />
           </div>
 
@@ -174,7 +205,9 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
             <div className="assets-list">
               <div className="asset-row">
                 <div className="asset-info">
-                  <span className="asset-icon">🖥️</span>
+                  <span className="asset-icon">
+                    <Monitor size={14} color="var(--text-dark-secondary)" />
+                  </span>
                   <span className="asset-status-dot dot-green"></span>
                   <span className="asset-name">pc1</span>
                 </div>
@@ -182,7 +215,9 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
 
               <div className="asset-row">
                 <div className="asset-info">
-                  <span className="asset-icon">🖥️</span>
+                  <span className="asset-icon">
+                    <Laptop size={14} color="var(--text-dark-secondary)" />
+                  </span>
                   <span className="asset-status-dot dot-orange"></span>
                   <span className="asset-name">ws-it20</span>
                 </div>
@@ -190,7 +225,9 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
 
               <div className="asset-row">
                 <div className="asset-info">
-                  <span className="asset-icon">📱</span>
+                  <span className="asset-icon">
+                    <Smartphone size={14} color="var(--text-dark-secondary)" />
+                  </span>
                   <span className="asset-status-dot dot-gray"></span>
                   <span className="asset-name">ip-4</span>
                 </div>
@@ -208,7 +245,9 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
       {/* Bottom Timeline Strip (from screenshot) */}
       <div className="bottom-timeline-strip">
         <div className="timeline-segment">
-          <div className="timeline-avatar">👩🏻</div>
+          <div className="timeline-avatar">
+            <User size={15} color="var(--text-dark-secondary)" />
+          </div>
           <div className="timeline-meta">
             <span className="timeline-label">Created on</span>
             <span className="timeline-time">Sep 24th 2024 11:05:02</span>
@@ -227,16 +266,14 @@ export default function BottomGrid({ onOpenTimeline, onTriggerAutomation }) {
         </div>
 
         <div className="timeline-segment">
-          <div className="timeline-avatar">👨🏼</div>
+          <div className="timeline-avatar">
+            <User size={15} color="var(--text-dark-secondary)" />
+          </div>
           <div className="timeline-meta">
             <span className="timeline-label">Assign on</span>
             <span className="timeline-time">Oct 15th 2024 10:42:11</span>
           </div>
         </div>
-
-        <button className="btn-full-timeline" onClick={onOpenTimeline}>
-          Full timeline
-        </button>
       </div>
     </div>
   );

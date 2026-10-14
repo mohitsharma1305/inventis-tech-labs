@@ -77,31 +77,34 @@ export default function AcademicDocs() {
       {/* Mathematical Formulation Banner */}
       <div
         style={{
-          background: 'rgba(6, 182, 212, 0.08)',
-          border: '1px solid rgba(6, 182, 212, 0.25)',
-          borderRadius: '12px',
-          padding: '18px 24px',
+          background: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.02)',
+          borderRadius: '14px',
+          padding: '20px 24px',
           marginBottom: '26px'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', marginBottom: '8px' }}>
-          <Cpu size={18} />
-          <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Implemented Risk Formulation (Li et al. & Kalniņa et al.):</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark-primary)', marginBottom: '10px' }}>
+          <Cpu size={18} color="var(--accent-orange)" />
+          <span style={{ fontWeight: 700, fontSize: '0.94rem' }}>Implemented Risk Formulation (Li et al. & Kalniņa et al.):</span>
         </div>
         <div
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '1.05rem',
-            color: '#fff',
-            background: 'rgba(0,0,0,0.3)',
+            fontSize: '1.02rem',
+            color: 'var(--text-dark-primary)',
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
             padding: '12px 18px',
             borderRadius: '8px',
-            letterSpacing: '0.04em'
+            letterSpacing: '0.04em',
+            fontWeight: 600
           }}
         >
           R = 100 × (0.45 · S_text + 0.35 · S_url + 0.20 · S_brand)
         </div>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-dark-muted)', marginTop: '8px', lineHeight: 1.5 }}>
           • S_text: Blended TF-IDF Logistic probability + Psychological intent triggers<br />
           • S_url: Lexical anomalies, Shannon entropy, disposable TLDs, and shorteners<br />
           • S_brand: Levenshtein distance typosquatting against verified institution whitelist

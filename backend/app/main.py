@@ -19,7 +19,9 @@ from .models.schemas import (
     FactorDetail,
     HistoryItem,
     DashboardStats,
-    BenchmarkCase
+    BenchmarkCase,
+    SandboxInspectRequest,
+    SandboxInspectResponse
 )
 from .engine.url_analyzer import extract_urls, analyze_url
 from .engine.brand_matcher import detect_brand_impersonation
@@ -27,6 +29,7 @@ from .engine.linguistic_analyzer import analyze_linguistic_patterns
 from .engine.ml_classifier import classifier_instance
 from .engine.risk_scorer import compute_composite_risk
 from .engine.xai_explainer import generate_explanation_and_guidance
+from .engine.sandbox_runner import run_virtual_sandbox_inspection
 from .database import init_db, save_case, search_cases, get_dashboard_metrics
 
 app = FastAPI(

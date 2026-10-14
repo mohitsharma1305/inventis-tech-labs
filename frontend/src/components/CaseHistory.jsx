@@ -51,11 +51,16 @@ export default function CaseHistory({ onSelectCase }) {
         <button
           id="export-audit-btn"
           className="preset-chip"
-          style={{ background: 'rgba(6, 182, 212, 0.15)', borderColor: 'var(--accent-cyan)' }}
+          style={{
+            background: '#ffffff',
+            border: '1px solid rgba(0, 0, 0, 0.12)',
+            color: 'var(--text-dark-primary)',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+          }}
           onClick={exportJSON}
         >
-          <Download size={14} color="var(--accent-cyan)" />
-          <span style={{ color: '#fff', fontWeight: 600 }}>Export Audit Log (JSON)</span>
+          <Download size={14} color="var(--text-dark-primary)" />
+          <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600 }}>Export Audit Log (JSON)</span>
         </button>
       </div>
 
@@ -121,15 +126,15 @@ export default function CaseHistory({ onSelectCase }) {
               history.map((row) => {
                 const isCrit = row.risk_level === 'CRITICAL';
                 const isSusp = row.risk_level === 'SUSPICIOUS';
-                const color = isCrit ? '#ef4444' : (isSusp ? '#f59e0b' : '#10b981');
+                const isThreat = isCrit || isSusp;
 
                 return (
                   <tr key={row.id}>
                     <td>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-dark-primary)', fontWeight: 600 }}>
                         {row.id}
                       </div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-dark-muted)' }}>
                         {new Date(row.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </td>
@@ -141,8 +146,10 @@ export default function CaseHistory({ onSelectCase }) {
                           textTransform: 'uppercase',
                           fontWeight: 600,
                           padding: '3px 8px',
-                          borderRadius: '4px',
-                          background: 'rgba(255, 255, 255, 0.06)'
+                          borderRadius: '6px',
+                          background: '#ffffff',
+                          color: 'var(--text-dark-primary)',
+                          border: '1px solid rgba(0, 0, 0, 0.08)'
                         }}
                       >
                         {row.channel}
@@ -150,11 +157,11 @@ export default function CaseHistory({ onSelectCase }) {
                     </td>
 
                     <td style={{ maxWidth: '380px' }}>
-                      <div style={{ fontSize: '0.85rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-dark-primary)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {row.preview}
                       </div>
                       {row.url && (
-                        <div style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dark-muted)' }}>
                           {row.url}
                         </div>
                       )}
@@ -162,11 +169,11 @@ export default function CaseHistory({ onSelectCase }) {
 
                     <td>
                       {row.brand_impersonation ? (
-                        <span style={{ fontSize: '0.78rem', color: '#fca5a5', fontWeight: 500 }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-dark-primary)', fontWeight: 600 }}>
                           {row.brand_impersonation}
                         </span>
                       ) : (
-                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>None</span>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text-dark-muted)' }}>None</span>
                       )}
                     </td>
 
@@ -175,13 +182,22 @@ export default function CaseHistory({ onSelectCase }) {
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
+                          gap: '7px',
                           fontSize: '0.82rem',
-                          fontWeight: 700,
-                          color: color
+                          fontWeight: 600,
+                          color: 'var(--text-dark-primary)'
                         }}
                       >
-                        {isCrit ? <Flame size={14} /> : (isSusp ? <AlertTriangle size={14} /> : <ShieldCheck size={14} />)}
+                        <span
+                          style={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            backgroundColor: isThreat ? '#ef4444' : '#10b981',
+                            display: 'inline-block',
+                            flexShrink: 0
+                          }}
+                        />
                         {row.risk_score} / 100
                       </span>
                     </td>
@@ -189,7 +205,7 @@ export default function CaseHistory({ onSelectCase }) {
                     <td>
                       <button
                         className="preset-chip"
-                        style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                        style={{ padding: '4px 10px', fontSize: '0.75rem', color: 'var(--text-dark-primary)' }}
                         onClick={() => onSelectCase && onSelectCase(row)}
                       >
                         Inspect

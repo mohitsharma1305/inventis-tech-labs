@@ -1,5 +1,14 @@
 import React from 'react';
-import { ShieldAlert, AlertOctagon, XCircle, CheckCircle, ExternalLink, ShieldCheck } from 'lucide-react';
+import {
+  ShieldAlert,
+  AlertTriangle,
+  X,
+  ShieldCheck,
+  Globe,
+  ExternalLink,
+  Lock,
+  ArrowRight
+} from 'lucide-react';
 
 export default function InterstitialModal({ isOpen, onClose, result }) {
   if (!isOpen || !result) return null;
@@ -8,73 +17,98 @@ export default function InterstitialModal({ isOpen, onClose, result }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="interstitial-card" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-top-brand">
-          <div className="modal-brand-pill">
-            <img src="/logoandname.png" alt="Inventis Safety Shield" className="modal-brand-img" />
+      <div className="interstitial-modal-window" onClick={(e) => e.stopPropagation()}>
+        {/* Window Titlebar */}
+        <div className="modal-window-titlebar">
+          <div className="modal-titlebar-brand">
+            <div className="modal-brand-badge-mini">
+              <img src="/logo.png" alt="Inventis" className="modal-logo-mini" />
+            </div>
+            <span className="modal-titlebar-text">Inventis Security Gateway</span>
+            <span className="modal-titlebar-tag">
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', marginRight: '5px' }}></span>
+              Target Intercepted
+            </span>
+          </div>
+          <button className="modal-close-icon-btn" onClick={onClose} title="Close window">
+            <X size={15} />
+          </button>
+        </div>
+
+        {/* Warning Hero Block */}
+        <div className="modal-hero-block">
+          <div className="modal-hazard-icon-wrap">
+            <ShieldAlert size={20} color="var(--text-dark-primary)" />
+          </div>
+          <div className="modal-hero-texts">
+            <h2 className="modal-hero-title">Untrusted Destination Blocked</h2>
+            <p className="modal-hero-subtitle">
+              Navigation to this external destination was halted because it exhibits characteristics of deceptive or malicious infrastructure.
+            </p>
           </div>
         </div>
 
-        <div className="interstitial-shield">
-          <img src="/logo.png" alt="Inventis Intercept Shield" className="modal-shield-logo" />
-        </div>
-
-        <div>
-          <h2 className="interstitial-title">
-            Pre-Interaction Threat Intercept
-          </h2>
-          <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#fca5a5', marginTop: '4px' }}>
-            IEEE-IGNITE Safety Shield intervened before your browser accessed untrusted content.
-          </p>
-        </div>
-
-        <div>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Destination Target Intercepted:
-          </span>
-          <div className="interstitial-dest">
+        {/* Intercepted URL Target Box */}
+        <div className="modal-target-box">
+          <div className="modal-target-label">
+            <Globe size={13} color="var(--text-dark-primary)" />
+            <span>Target Destination</span>
+          </div>
+          <div className="modal-target-url">
             {targetUrl}
           </div>
         </div>
 
-        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: '10px', fontSize: '0.82rem' }}>
-          <div style={{ fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
-            Why Access Was Blocked:
-          </div>
-          <ul style={{ paddingLeft: '20px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {/* Why Blocked - Itemized Threat Factors */}
+        <div className="modal-threat-reasons">
+          <div className="reasons-heading">Security Risk Findings</div>
+          <div className="reasons-list">
             {result.brand_impersonation && (
-              <li>
-                <strong style={{ color: '#f87171' }}>Impersonation Hazard:</strong> Host does not belong to authorized servers of {result.brand_impersonation}.
-              </li>
+              <div className="reason-item">
+                <span className="reason-dot dot-red"></span>
+                <div>
+                  <strong className="reason-title">Impersonation Detected:</strong>
+                  <span className="reason-desc"> Host infrastructure is not recognized as an authorized service for {result.brand_impersonation}.</span>
+                </div>
+              </div>
             )}
-            <li>
-              <strong style={{ color: '#f87171' }}>Urgency Manipulation:</strong> Message text utilizes artificial deadlines to panic the reader.
-            </li>
-            <li>
-              <strong style={{ color: '#f87171' }}>Credential Harvesting Risk:</strong> Detected high likelihood of fake login or payment deceptions.
-            </li>
-          </ul>
+            <div className="reason-item">
+              <span className="reason-dot dot-red"></span>
+              <div>
+                <strong className="reason-title">Social Engineering Pattern:</strong>
+                <span className="reason-desc"> Message structure deploys artificial urgency cues designed to compel immediate compliance.</span>
+              </div>
+            </div>
+            <div className="reason-item">
+              <span className="reason-dot dot-red"></span>
+              <div>
+                <strong className="reason-title">Credential Theft Risk:</strong>
+                <span className="reason-desc"> High probability of harvesting banking credentials, one-time passwords, or unauthorized authorization.</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="interstitial-actions">
+        {/* Modal Action Buttons */}
+        <div className="modal-actions-row">
           <button
             id="modal-abort-btn"
-            className="btn-abort"
+            className="btn-modal-abort"
             onClick={() => {
               alert('Protection confirmed: Navigation aborted. Threat logged to security history.');
               onClose();
             }}
           >
-            <ShieldCheck size={18} />
-            <span>Abort & Block Link (Safe Choice)</span>
+            <ShieldCheck size={16} />
+            <span>Abort Navigation & Return</span>
           </button>
 
           <button
             id="modal-close-btn"
-            className="btn-bypass"
+            className="btn-modal-dismiss"
             onClick={onClose}
           >
-            Close Shield
+            Dismiss
           </button>
         </div>
       </div>

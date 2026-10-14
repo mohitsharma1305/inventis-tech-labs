@@ -29,7 +29,16 @@ export default function App() {
 
   useEffect(() => {
     checkBackendHealth().then((status) => setBackendStatus(status));
-    fetchBenchmarks().then((data) => setBenchmarks(data));
+    fetchBenchmarks().then((data) => {
+      setBenchmarks(data);
+      if (data && data.length > 0) {
+        setInputText(data[0].sample_text);
+        setInputUrl(data[0].sample_url || '');
+        setChannel(data[0].channel);
+        // Pre-run analysis so dashboard has data, but DO NOT auto-open popup on start
+        handleRunAnalysis(data[0].sample_text, data[0].sample_url || '', data[0].channel, false);
+      }
+    });
   }, []);
 
   const handleRunAnalysis = async (customText, customUrl, customChannel) => {
@@ -47,11 +56,8 @@ export default function App() {
         channel: chanToScan
       });
       setResult(res);
-
-      // Auto-open interstitial warning if threat is critical
-      if (res.interstitial_warning_needed && res.risk_level === 'CRITICAL') {
-        setIsModalOpen(true);
-      }
+      // NOTE: Do NOT auto-open modal on scans or presets. 
+      // The modal only opens when the user explicitly clicks "Simulate Link Intercept".
     } catch (err) {
       console.error('Analysis failed:', err);
     } finally {
@@ -64,7 +70,7 @@ export default function App() {
     setInputUrl(bench.sample_url || '');
     setChannel(bench.channel);
     setActiveTab('analyze');
-    // Auto-execute analysis for smooth 1-click jury demo
+    // Execute analysis smoothly without popping up any modal
     handleRunAnalysis(bench.sample_text, bench.sample_url || '', bench.channel);
   };
 
@@ -137,10 +143,7 @@ export default function App() {
           {/* 4 Bottom Sage Cards & Timeline Strip (Matching Bottom Grid in Screenshot) */}
           <BottomGrid
             onOpenTimeline={() => setActiveTab('history')}
-            onTriggerAutomation={(type) => {
-              if (type === 'playbooks') setIsModalOpen(true);
-              else handleQuickPreset();
-            }}
+            onTriggerAutomation={() => handleQuickPreset()}
           />
         </>
       )}
@@ -170,24 +173,7 @@ export default function App() {
       )}
 
 
-      {/* Global Application Footer */}
-      <footer className="app-footer">
-        <div className="footer-content">
-          <div className="footer-brand-lockup">
-            <div className="footer-logo-pill">
-              <img src="/logoandname.png" alt="Inventis" className="footer-logo-img" />
-            </div>
-            <span className="brand-tag-skit">SKIT025</span>
-          </div>
-          <p className="footer-text">
-            Inventis — IEEE-IGNITE Hackathon | Swami Keshvanand Institute of Technology, Jaipur
-          </p>
-          <div className="footer-security-status">
-            <img src="/logo.png" alt="Shield Emblem" className="footer-emblem-mini" />
-            <span>Dual-Framework Threat Defense Pipeline Active</span>
-          </div>
-        </div>
-      </footer>
+
 
       {/* Pre-Interaction Protective Modal (SKIT025 Interstitial Shield) */}
       <InterstitialModal

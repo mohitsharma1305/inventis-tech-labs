@@ -1,9 +1,6 @@
 import React from 'react';
-import { Eye, Mail, LayoutGrid, ShieldAlert, Sparkles } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, backendStatus, onQuickPreset }) {
-  const isOnline = backendStatus?.status === 'online';
-
   return (
     <nav className="cyberguard-navbar">
       {/* Brand Section: Full Name and Logo on White Background */}
@@ -14,7 +11,7 @@ export default function Navbar({ activeTab, setActiveTab, backendStatus, onQuick
         <span className="brand-tag-skit">SKIT025</span>
       </div>
 
-      {/* Center Navigation Pills (Restored original names, Executions removed) */}
+      {/* Center Navigation Pills */}
       <div className="center-nav-pills">
         <button
           id="nav-overview-btn"
@@ -47,41 +44,6 @@ export default function Navbar({ activeTab, setActiveTab, backendStatus, onQuick
           onClick={onQuickPreset}
         >
           +
-        </button>
-      </div>
-
-      {/* Right Quick Action Group */}
-      <div className="right-nav-actions">
-        <button
-          id="nav-alerts-table-btn"
-          className="pill-action-btn"
-          onClick={() => setActiveTab('history')}
-        >
-          Alerts Table
-        </button>
-
-        <button
-          className="icon-circle-btn"
-          title={isOnline ? "AI Pipeline Active (Port 8000)" : "Client Mode"}
-          onClick={() => setActiveTab('analyze')}
-        >
-          <Eye size={15} color={isOnline ? '#10b981' : '#ff6b2b'} />
-        </button>
-
-        <button
-          className="icon-circle-btn"
-          title="Security Incidents Mail"
-          onClick={() => setActiveTab('history')}
-        >
-          <Mail size={15} />
-        </button>
-
-        <button
-          className="icon-circle-btn"
-          title="Threat Radar Layout"
-          onClick={() => setActiveTab('dashboard')}
-        >
-          <LayoutGrid size={15} />
         </button>
       </div>
     </nav>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap, AlertCircle, ShieldCheck, Flame } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 export default function BenchmarkSelector({ benchmarks, onSelectBenchmark }) {
   if (!benchmarks || benchmarks.length === 0) return null;
@@ -8,11 +8,11 @@ export default function BenchmarkSelector({ benchmarks, onSelectBenchmark }) {
     <div className="benchmarks-bar glass-panel">
       <div className="benchmarks-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Zap size={16} color="var(--accent-cyan)" />
-          <span style={{ fontWeight: 600, color: '#fff' }}>IEEE-IGNITE Demonstration Scenarios (1-Click Test Presets)</span>
+          <Zap size={16} color="var(--accent-orange)" />
+          <span style={{ fontWeight: 600, color: 'var(--text-dark-primary)' }}>Live Scam Test Scenarios (1-Click Simulation Presets)</span>
         </div>
-        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          Click any preset to auto-populate and test real-world Indian & campus scam vectors
+        <span style={{ fontSize: '0.78rem', color: 'var(--text-dark-muted)' }}>
+          Click any preset to simulate real-world attacks (banking KYC, campus ERP fee fraud, power bill scam, or safe alerts) and see how the defense system responds.
         </span>
       </div>
 
@@ -27,24 +27,17 @@ export default function BenchmarkSelector({ benchmarks, onSelectBenchmark }) {
               onClick={() => onSelectBenchmark(bench)}
               title={bench.description}
             >
-              {isCritical ? (
-                <Flame size={14} color="#ef4444" />
-              ) : (
-                <ShieldCheck size={14} color="#10b981" />
-              )}
-              <span>{bench.title}</span>
               <span
                 style={{
-                  fontSize: '0.7rem',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  backgroundColor: isCritical ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                  color: isCritical ? '#fca5a5' : '#86efac',
-                  fontWeight: 600
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: isCritical ? '#ef4444' : '#10b981',
+                  display: 'inline-block',
+                  flexShrink: 0
                 }}
-              >
-                {bench.expected_risk}
-              </span>
+              />
+              <span style={{ color: 'var(--text-dark-primary)', fontWeight: 500 }}>{bench.title}</span>
             </button>
           );
         })}

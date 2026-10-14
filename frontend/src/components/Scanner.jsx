@@ -57,8 +57,11 @@ export default function Scanner({
 
     return (
       <div style={{ marginTop: '14px' }}>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
-          Real-time Linguistic Trigger Map (Salloum et al. 2022):
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-dark-primary)', fontWeight: 600, marginBottom: '2px' }}>
+          Detected Warning Triggers & Coercive Phrases:
+        </p>
+        <p style={{ fontSize: '0.74rem', color: 'var(--text-dark-muted)', marginBottom: '6px' }}>
+          Highlighted keywords that attempt to pressure, threaten, or panic the recipient.
         </p>
         <div className="highlight-container">
           {elements}
@@ -71,61 +74,71 @@ export default function Scanner({
     <div className="input-section glass-panel">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 700 }}>
-            Inspect Suspect Message or Link
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-dark-primary)' }}>
+            Message & Link Threat Scanner
           </h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-            Evaluates text intent, typosquatting, urgency tension, and domain infrastructure.
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-dark-muted)', marginTop: '2px' }}>
+            Paste any suspicious SMS, email, WhatsApp forward, or URL to inspect for phishing, scams, and deceptive content.
           </p>
         </div>
       </div>
 
       {/* Channel Selector */}
-      <div className="channel-selector">
-        <button
-          id="channel-sms-btn"
-          className={`channel-btn ${channel === 'sms' ? 'active' : ''}`}
-          onClick={() => setChannel('sms')}
-        >
-          <MessageSquare size={15} />
-          <span>SMS Text</span>
-        </button>
+      <div style={{ marginTop: '12px' }}>
+        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-dark-secondary)', marginBottom: '6px' }}>
+          Communication Channel: <span style={{ fontWeight: 400, color: 'var(--text-dark-muted)', fontSize: '0.76rem' }}>(select where you received this message)</span>
+        </div>
+        <div className="channel-selector">
+          <button
+            id="channel-sms-btn"
+            className={`channel-btn ${channel === 'sms' ? 'active' : ''}`}
+            onClick={() => setChannel('sms')}
+          >
+            <MessageSquare size={15} />
+            <span>SMS Text</span>
+          </button>
 
-        <button
-          id="channel-email-btn"
-          className={`channel-btn ${channel === 'email' ? 'active' : ''}`}
-          onClick={() => setChannel('email')}
-        >
-          <Mail size={15} />
-          <span>Email</span>
-        </button>
+          <button
+            id="channel-email-btn"
+            className={`channel-btn ${channel === 'email' ? 'active' : ''}`}
+            onClick={() => setChannel('email')}
+          >
+            <Mail size={15} />
+            <span>Email</span>
+          </button>
 
-        <button
-          id="channel-social-btn"
-          className={`channel-btn ${channel === 'social' ? 'active' : ''}`}
-          onClick={() => setChannel('social')}
-        >
-          <Share2 size={15} />
-          <span>WhatsApp / Social</span>
-        </button>
+          <button
+            id="channel-social-btn"
+            className={`channel-btn ${channel === 'social' ? 'active' : ''}`}
+            onClick={() => setChannel('social')}
+          >
+            <Share2 size={15} />
+            <span>WhatsApp / Social</span>
+          </button>
 
-        <button
-          id="channel-url-btn"
-          className={`channel-btn ${channel === 'url' ? 'active' : ''}`}
-          onClick={() => setChannel('url')}
-        >
-          <Globe size={15} />
-          <span>Standalone URL</span>
-        </button>
+          <button
+            id="channel-url-btn"
+            className={`channel-btn ${channel === 'url' ? 'active' : ''}`}
+            onClick={() => setChannel('url')}
+          >
+            <Globe size={15} />
+            <span>Standalone URL</span>
+          </button>
+        </div>
       </div>
 
       {/* Message Text Input */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-          <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-            Message Content
-          </label>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          <div>
+            <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-dark-primary)', display: 'block' }}>
+              Suspicious Message Text:
+            </label>
+            <span style={{ fontSize: '0.76rem', color: 'var(--text-dark-muted)' }}>
+              Paste the full text body of the received message
+            </span>
+          </div>
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-dark-muted)' }}>
             {inputText.length} characters
           </span>
         </div>
@@ -140,9 +153,12 @@ export default function Scanner({
 
       {/* Optional Standalone URL Field */}
       <div>
-        <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-          Destination URL (Optional / Auto-extracted from text)
+        <label style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-dark-primary)', display: 'block', marginBottom: '2px' }}>
+          Destination Website Address (URL):
         </label>
+        <span style={{ fontSize: '0.76rem', color: 'var(--text-dark-muted)', display: 'block', marginBottom: '6px' }}>
+          Auto-extracted from message text, or enter manually for link-only inspection
+        </span>
         <input
           id="url-input"
           type="text"
@@ -182,12 +198,13 @@ export default function Scanner({
           <button
             id="clear-input-btn"
             style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-muted)',
+              background: '#ffffff',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              color: 'var(--text-dark-secondary)',
               borderRadius: '10px',
               padding: '0 16px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontWeight: 500
             }}
             onClick={() => {
               setInputText('');

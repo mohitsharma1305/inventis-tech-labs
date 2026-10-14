@@ -9,7 +9,11 @@ import {
   Activity,
   Layers,
   Radio,
-  ExternalLink
+  ExternalLink,
+  Triangle,
+  FileText,
+  ShieldAlert,
+  Zap
 } from 'lucide-react';
 
 export default function DynamicRadarCard({
@@ -55,7 +59,12 @@ export default function DynamicRadarCard({
           <button className="back-btn" title="Back to Overview">
             <ArrowLeft size={16} />
           </button>
-          <h2 className="dynamic-title">Dynamic View</h2>
+          <div>
+            <h2 className="dynamic-title">Real-Time Threat Telemetry Radar</h2>
+            <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.65)', marginTop: '2px' }}>
+              Live cockpit monitoring active risk score, multi-vector threat signals, and incident stream.
+            </p>
+          </div>
         </div>
 
         <div className="dynamic-meta-group">
@@ -186,7 +195,7 @@ export default function DynamicRadarCard({
 
               {/* Vultr Node */}
               <div className="radar-brand-tag" style={{ right: '27%', top: '38%' }}>
-                <span className="brand-icon-symbol">▲</span>
+                <Triangle size={8} fill="currentColor" />
                 <span className="brand-pill-text" style={{ fontSize: '0.72rem' }}>VULTR</span>
               </div>
 
@@ -250,7 +259,9 @@ export default function DynamicRadarCard({
           <div className="feed-cards-stack">
             {/* Pill 1 */}
             <div className="feed-pill">
-              <span className="feed-icon-box">📋</span>
+              <span className="feed-icon-box">
+                <FileText size={15} color="var(--text-light-secondary)" />
+              </span>
               <span className="feed-text">3 Incidents reopened</span>
             </div>
 
@@ -274,13 +285,17 @@ export default function DynamicRadarCard({
 
             {/* Pill 3 */}
             <div className="feed-pill">
-              <span className="feed-icon-box">🛡️</span>
+              <span className="feed-icon-box">
+                <ShieldAlert size={15} color="var(--text-light-secondary)" />
+              </span>
               <span className="feed-text">2 Incidents reopened</span>
             </div>
 
             {/* Pill 4 */}
             <div className="feed-pill">
-              <span className="feed-icon-box">⚡</span>
+              <span className="feed-icon-box">
+                <Zap size={15} color="var(--text-light-secondary)" />
+              </span>
               <span className="feed-text">Incident created | ID-997</span>
             </div>
           </div>

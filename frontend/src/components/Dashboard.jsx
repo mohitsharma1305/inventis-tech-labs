@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Flame, AlertTriangle, Activity, BarChart2, TrendingUp, Layers, Building } from 'lucide-react';
+import {
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  Activity,
+  BarChart2,
+  Layers,
+  Building,
+  Mail,
+  MessageSquare,
+  Share2,
+  Globe
+} from 'lucide-react';
 import { fetchDashboardStats } from '../api/client';
 
 export default function Dashboard() {
@@ -10,7 +22,7 @@ export default function Dashboard() {
   }, []);
 
   if (!stats) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Loading security operations metrics...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-dark-muted)' }}>Loading security operations metrics...</div>;
   }
 
   const total = stats.total_analyzed || 1;
@@ -20,54 +32,64 @@ export default function Dashboard() {
 
   return (
     <div>
+      {/* Page Header */}
+      <div style={{ marginBottom: '20px' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-dark-primary)' }}>
+          Security Operations Center (SOC) Telemetry
+        </h2>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-dark-muted)', marginTop: '2px' }}>
+          Real-time enterprise metrics, threat channel origins, and brand impersonation tracking across the Indian communications ecosystem.
+        </p>
+      </div>
+
       {/* KPI Metric Cards */}
       <div className="stats-grid">
         <div className="stat-card glass-panel">
           <div className="stat-label">
-            <Activity size={16} color="var(--accent-cyan)" />
-            <span>Total Messages Evaluated</span>
+            <Activity size={16} color="var(--text-dark-primary)" />
+            <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600 }}>Total Messages Evaluated</span>
           </div>
-          <div className="stat-value">{stats.total_analyzed}</div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          <div className="stat-value" style={{ color: 'var(--text-dark-primary)' }}>{stats.total_analyzed}</div>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)' }}>
             Real-time multi-modal audit stream
           </span>
         </div>
 
-        <div className="stat-card glass-panel" style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+        <div className="stat-card glass-panel">
           <div className="stat-label">
-            <Flame size={16} color="#ef4444" />
-            <span>Critical Phishing Blocked</span>
+            <ShieldAlert size={16} color="var(--text-dark-primary)" />
+            <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600 }}>Critical Phishing Blocked</span>
           </div>
-          <div className="stat-value" style={{ color: '#ef4444' }}>
+          <div className="stat-value" style={{ color: 'var(--text-dark-primary)' }}>
             {stats.critical_threats}
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#fca5a5' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)' }}>
             {critPct}% of inspected vectors
           </span>
         </div>
 
-        <div className="stat-card glass-panel" style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
+        <div className="stat-card glass-panel">
           <div className="stat-label">
-            <AlertTriangle size={16} color="#f59e0b" />
-            <span>Suspicious Anomalies</span>
+            <AlertTriangle size={16} color="var(--text-dark-primary)" />
+            <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600 }}>Suspicious Anomalies</span>
           </div>
-          <div className="stat-value" style={{ color: '#f59e0b' }}>
+          <div className="stat-value" style={{ color: 'var(--text-dark-primary)' }}>
             {stats.suspicious_cases}
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#fcd34d' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)' }}>
             {suspPct}% required warning
           </span>
         </div>
 
-        <div className="stat-card glass-panel" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+        <div className="stat-card glass-panel">
           <div className="stat-label">
-            <ShieldCheck size={16} color="#10b981" />
-            <span>Clean / Safe Traffic</span>
+            <ShieldCheck size={16} color="var(--text-dark-primary)" />
+            <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600 }}>Clean / Safe Traffic</span>
           </div>
-          <div className="stat-value" style={{ color: '#10b981' }}>
+          <div className="stat-value" style={{ color: 'var(--text-dark-primary)' }}>
             {stats.safe_cases}
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#86efac' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-dark-muted)' }}>
             {safePct}% passed security baseline
           </span>
         </div>
@@ -77,38 +99,47 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
         {/* Risk Distribution Breakdown */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BarChart2 size={18} color="var(--accent-cyan)" />
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark-primary)' }}>
+            <BarChart2 size={18} color="var(--text-dark-primary)" />
             <span>Threat Severity Distribution</span>
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-                <span style={{ color: '#ef4444', fontWeight: 600 }}>Critical Phishing & Scams (70–100)</span>
-                <span>{stats.critical_threats} cases ({critPct}%)</span>
+                <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block' }} />
+                  Critical Phishing & Scams (70–100)
+                </span>
+                <span style={{ color: 'var(--text-dark-muted)' }}>{stats.critical_threats} cases ({critPct}%)</span>
               </div>
-              <div style={{ height: '10px', borderRadius: '5px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ height: '8px', borderRadius: '4px', background: 'rgba(0, 0, 0, 0.08)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${critPct}%`, background: '#ef4444' }}></div>
               </div>
             </div>
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-                <span style={{ color: '#f59e0b', fontWeight: 600 }}>Suspicious Communications (30–69)</span>
-                <span>{stats.suspicious_cases} cases ({suspPct}%)</span>
+                <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#f59e0b', display: 'inline-block' }} />
+                  Suspicious Communications (30–69)
+                </span>
+                <span style={{ color: 'var(--text-dark-muted)' }}>{stats.suspicious_cases} cases ({suspPct}%)</span>
               </div>
-              <div style={{ height: '10px', borderRadius: '5px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ height: '8px', borderRadius: '4px', background: 'rgba(0, 0, 0, 0.08)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${suspPct}%`, background: '#f59e0b' }}></div>
               </div>
             </div>
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-                <span style={{ color: '#10b981', fontWeight: 600 }}>Verified Clean Messages (0–29)</span>
-                <span>{stats.safe_cases} cases ({safePct}%)</span>
+                <span style={{ color: 'var(--text-dark-primary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }} />
+                  Verified Clean Messages (0–29)
+                </span>
+                <span style={{ color: 'var(--text-dark-muted)' }}>{stats.safe_cases} cases ({safePct}%)</span>
               </div>
-              <div style={{ height: '10px', borderRadius: '5px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ height: '8px', borderRadius: '4px', background: 'rgba(0, 0, 0, 0.08)', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${safePct}%`, background: '#10b981' }}></div>
               </div>
             </div>
@@ -117,8 +148,8 @@ export default function Dashboard() {
 
         {/* Top Impersonated Targets */}
         <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Building size={18} color="var(--accent-cyan)" />
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark-primary)' }}>
+            <Building size={18} color="var(--text-dark-primary)" />
             <span>Top Impersonated Entities (Indian Ecosystem)</span>
           </h3>
 
@@ -131,16 +162,17 @@ export default function Dashboard() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 14px',
-                  borderRadius: '8px',
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid var(--border-color)'
+                  borderRadius: '10px',
+                  background: '#ffffff',
+                  border: '1px solid rgba(0, 0, 0, 0.06)',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dark-muted)' }}>
                     #{idx + 1}
                   </span>
-                  <span style={{ fontSize: '0.88rem', fontWeight: 500, color: '#fff' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-dark-primary)' }}>
                     {b.brand}
                   </span>
                 </div>
@@ -148,10 +180,11 @@ export default function Dashboard() {
                   style={{
                     fontSize: '0.78rem',
                     fontWeight: 600,
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                    background: 'rgba(239, 68, 68, 0.15)',
-                    color: '#f87171'
+                    padding: '3px 10px',
+                    borderRadius: '6px',
+                    background: '#f8fafc',
+                    color: 'var(--text-dark-primary)',
+                    border: '1px solid rgba(0, 0, 0, 0.08)'
                   }}
                 >
                   {b.count} attempts
@@ -164,34 +197,47 @@ export default function Dashboard() {
 
       {/* Attack Vectors by Channel */}
       <div className="glass-panel" style={{ padding: '24px' }}>
-        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Layers size={18} color="var(--accent-cyan)" />
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dark-primary)' }}>
+          <Layers size={18} color="var(--text-dark-primary)" />
           <span>Threat Origin by Communication Channel</span>
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-          {Object.entries(stats.threats_by_channel || {}).map(([chan, cnt]) => (
-            <div
-              key={chan}
-              style={{
-                padding: '16px',
-                borderRadius: '10px',
-                background: 'rgba(0,0,0,0.3)',
-                border: '1px solid var(--border-color)',
-                textAlign: 'center'
-              }}
-            >
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {chan}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+          {Object.entries(stats.threats_by_channel || {}).map(([chan, cnt]) => {
+            const chanLower = chan.toLowerCase();
+            let ChannelIcon = Globe;
+            if (chanLower.includes('mail')) ChannelIcon = Mail;
+            else if (chanLower.includes('sms')) ChannelIcon = MessageSquare;
+            else if (chanLower.includes('social') || chanLower.includes('whatsapp')) ChannelIcon = Share2;
+
+            return (
+              <div
+                key={chan}
+                style={{
+                  padding: '18px 16px',
+                  borderRadius: '12px',
+                  background: '#ffffff',
+                  border: '1px solid rgba(0, 0, 0, 0.06)',
+                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.02)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-dark-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                  <ChannelIcon size={14} color="var(--text-dark-primary)" />
+                  <span>{chan}</span>
+                </div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 700, color: 'var(--text-dark-primary)', margin: '2px 0' }}>
+                  {cnt}
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--text-dark-muted)', fontWeight: 500 }}>
+                  Active Channel Filter
+                </div>
               </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 700, color: '#fff', margin: '4px 0' }}>
-                {cnt}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>
-                Active Channel Filter
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
