@@ -1,191 +1,116 @@
-"""
-FastAPI Application Entry Point for PhishGuard AI (SKIT025).
-Provides high-performance REST APIs for multi-channel analysis,
-threat history search, and security dashboard telemetry.
-"""
-
-import uuid
-from datetime import datetime, timezone
-import json
-import os
-from typing import Optional, List
-from fastapi import FastAPI, Query, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-
-from .config import RISK_THRESHOLD_CRITICAL
-from .models.schemas import (
-    AnalyzeRequest,
-    AnalyzeResponse,
-    FactorDetail,
-    HistoryItem,
-    DashboardStats,
-    BenchmarkCase,
-    SandboxInspectRequest,
-    SandboxInspectResponse
-)
-from .engine.url_analyzer import extract_urls, analyze_url
+import os,re,time,uuid,logging
+from collections import deque
+from threading import Lock
+from contextlib import asynccontextmanager
+from datetime import datetime,timezone
+from pathlib import Path
+from typing import Annotated,Literal
+from fastapi import FastAPI,Header,HTTPException,Depends,Query
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from psycopg import Error as DatabaseError
+from psycopg_pool import PoolTimeout
+from . import database as db
+from .models.schemas import AnalyzeRequest,FactorDetail
+from .engine.url_analyzer import extract_urls,analyze_url
 from .engine.brand_matcher import detect_brand_impersonation
 from .engine.linguistic_analyzer import analyze_linguistic_patterns
 from .engine.ml_classifier import classifier_instance
 from .engine.risk_scorer import compute_composite_risk
-from .engine.xai_explainer import generate_explanation_and_guidance
-from .engine.sandbox_runner import run_virtual_sandbox_inspection
-from .database import init_db, save_case, search_cases, get_dashboard_metrics
 
-app = FastAPI(
-    title="Inventis — Multi-Vector Threat Defense Platform",
-    description="AI-driven Phishing, Scam, and Malicious URL Detection Engine (IEEE-IGNITE SKIT025)",
-    version="1.0.0"
-)
+@asynccontextmanager
+async def lifespan(app):
+    db.init_db()
+    yield
+    db.pool.close()
+app=FastAPI(title='Inventis',version='2.0.0',lifespan=lifespan)
+@app.exception_handler(DatabaseError)
+@app.exception_handler(PoolTimeout)
+async def database_error(request,exc):
+    logging.error('Database operation failed: %s',type(exc).__name__)
+    return JSONResponse(status_code=503,content={'detail':'Storage is temporarily unavailable. No report was fabricated. Please retry.'})
+@app.middleware('http')
+async def security_headers(request,call_next):
+    if request.headers.get('content-length','').isdigit() and int(request.headers['content-length'])>100000:
+        return JSONResponse(status_code=413,content={'detail':'Request too large'})
+    response=await call_next(request)
+    response.headers['X-Content-Type-Options']='nosniff'
+    response.headers['Referrer-Policy']='no-referrer'
+    response.headers['X-Frame-Options']='DENY'
+    if request.url.path.startswith('/api/'): response.headers['Cache-Control']='no-store'
+    return response
 
-# Enable CORS for local web dev and frontend clients
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def workspace(x_workspace_token:Annotated[str,Header()]):
+    if not re.fullmatch('[a-f0-9]{64}',x_workspace_token):raise HTTPException(401,'Invalid browser workspace token')
+    return db.workspace_key(x_workspace_token)
+rate_lock=Lock();rate_buckets={}
+def limit_requests(key):
+    now=time.monotonic()
+    with rate_lock:
+        if len(rate_buckets)>2000:
+            for k in list(rate_buckets):
+                if not rate_buckets[k] or now-rate_buckets[k][-1]>60:del rate_buckets[k]
+            if len(rate_buckets)>2000:raise HTTPException(429,'Service busy. Try again shortly.')
+        q=rate_buckets.setdefault(key,deque())
+        while q and now-q[0]>60:q.popleft()
+        if len(q)>=30:raise HTTPException(429,'Please wait a minute before submitting more analyses.')
+        q.append(now)
+@app.get('/api/health')
+def health():
+    db.healthy()
+    return {'status':'online','database':'postgresql','models_loaded':classifier_instance.model is not None,
+      'engine':'TF-IDF + Logistic Regression and rules','model_evaluation':'Not established; small bundled baseline corpus',
+      'live_reputation':False,'vm_inspection':False,'version':'2.0.0'}
 
-@app.on_event("startup")
-def on_startup():
-    init_db()
-
-@app.get("/api/health")
-def health_check():
-    return {
-        "status": "online",
-        "service": "Inventis Backend",
-        "version": "1.0.0",
-        "models_loaded": classifier_instance.model is not None
-    }
-
-@app.post("/api/analyze", response_model=AnalyzeResponse)
-def analyze_content(req: AnalyzeRequest):
-    case_id = f"pg-{uuid.uuid4().hex[:8]}"
-    now_iso = datetime.now(timezone.utc).isoformat()
-
-    # 1. URL Extraction & Inspection
-    target_url = req.url
-    if not target_url:
-        extracted = extract_urls(req.text)
-        if extracted:
-            target_url = extracted[0]
-
-    url_result = None
-    url_score = None
-    target_domain = None
-
-    if target_url:
-        url_result = analyze_url(target_url)
-        url_score = url_result.lexical_score
-        target_domain = url_result.domain
-
-    # 2. Brand Impersonation & Typosquatting
-    matched_brand, brand_score, brand_reasons = detect_brand_impersonation(req.text, target_domain)
-
-    # 3. Linguistic Intent & Pattern Analysis
-    ling_score, triggers, linguistic_factors = analyze_linguistic_patterns(req.text)
-
-    # 4. Statistical ML Classifier Inference (TF-IDF + Logistic Regression)
-    ml_prob, ml_meta = classifier_instance.predict_phishing_probability(req.text)
-
-    # 5. Compile all contributing factors (XAI)
-    all_factors: List[FactorDetail] = list(linguistic_factors)
-
-    if brand_score > 0 and matched_brand:
-        all_factors.append(FactorDetail(
-            category="Brand Impersonation",
-            name=f"Unauthorized {matched_brand} Claim",
-            description="; ".join(brand_reasons),
-            severity="critical" if brand_score >= 0.7 else "warning",
-            points=brand_score
-        ))
-
-    if url_result and url_result.reasons:
-        for r in url_result.reasons:
-            all_factors.append(FactorDetail(
-                category="URL & Domain Anomaly",
-                name="Suspicious Link Infrastructure",
-                description=r,
-                severity="critical" if url_result.is_ip_host or url_result.suspicious_tld else "warning",
-                points=url_result.lexical_score
-            ))
-
-    # Check if critical credential harvesting is happening
-    has_cred_harvest = any(f.category == "Credential Harvesting" for f in all_factors)
-
-    # 6. Composite Risk Score Computation (0 - 100)
-    risk_score, risk_level, breakdown = compute_composite_risk(
-        text_prob=ml_prob,
-        linguistic_score=ling_score,
-        url_score=url_score,
-        brand_score=brand_score,
-        has_critical_credential_harvesting=has_cred_harvest
-    )
-
-    # 7. SmishX Explainability & Interstitial Trigger Evaluation
-    summary, recommended_action, interstitial_warning = generate_explanation_and_guidance(
-        risk_level=risk_level,
-        risk_score=risk_score,
-        factors=all_factors,
-        brand=matched_brand,
-        url_result=url_result
-    )
-
-    # 8. Construct response
-    response_data = AnalyzeResponse(
-        id=case_id,
-        timestamp=now_iso,
-        channel=req.channel or "sms",
-        risk_score=risk_score,
-        risk_level=risk_level,
-        is_phishing=(risk_level == "CRITICAL"),
-        summary=summary,
-        recommended_action=recommended_action,
-        factors=all_factors,
-        triggers=triggers,
-        url_analysis=url_result,
-        brand_impersonation=matched_brand,
-        ml_confidence=ml_prob,
-        interstitial_warning_needed=interstitial_warning
-    )
-
-    # 9. Persist to SQLite Case Audit Trail
-    save_case({
-        "id": case_id,
-        "timestamp": now_iso,
-        "channel": req.channel or "sms",
-        "text": req.text,
-        "url": target_url,
-        "risk_score": risk_score,
-        "risk_level": risk_level,
-        "brand_impersonation": matched_brand,
-        "factors": [f.dict() for f in all_factors],
-        "summary": summary,
-        "recommended_action": recommended_action
-    })
-
-    return response_data
-
-@app.get("/api/history", response_model=List[HistoryItem])
-def get_history(
-    query: Optional[str] = Query(None, description="Keyword search query"),
-    risk_level: Optional[str] = Query("ALL", description="Filter by risk level: SAFE, SUSPICIOUS, CRITICAL, ALL"),
-    channel: Optional[str] = Query("all", description="Filter by channel: sms, email, social, all"),
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0)
-):
-    return search_cases(query=query, risk_level=risk_level, channel=channel, limit=limit, offset=offset)
-
-@app.get("/api/dashboard/stats", response_model=DashboardStats)
-def get_dashboard_statistics():
-    return get_dashboard_metrics()
-
-@app.get("/api/benchmarks", response_model=List[BenchmarkCase])
-def get_benchmark_cases():
-    benchmarks_path = os.path.join(os.path.dirname(__file__), "data", "benchmark_cases.json")
-    if os.path.exists(benchmarks_path):
-        with open(benchmarks_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
+def evaluate(req):
+    candidates=list(dict.fromkeys(([req.url] if req.url else [])+extract_urls(req.text)))
+    if len(candidates)>20:raise HTTPException(422,'A maximum of 20 URLs can be inspected per request')
+    urls=[]
+    for candidate in candidates:
+        try:urls.append(analyze_url(candidate))
+        except ValueError:raise HTTPException(422,'One of the extracted links is invalid. Check the message or URL.')
+    ling,triggers,factors=analyze_linguistic_patterns(req.text)
+    if req.text:
+        try:ml_prob,ml_meta=classifier_instance.predict_phishing_probability(req.text)
+        except RuntimeError:raise HTTPException(503,'Text classifier unavailable. Please retry later.')
+    else:ml_prob,ml_meta=None,{'status':'not_applicable'}
+    assessments=[]
+    for result in urls or [None]:
+        brand,bs,reasons=detect_brand_impersonation(req.text,result.domain if result else None)
+        if bs>0 and brand:factors.append(FactorDetail(category='Brand consistency',name='Unverified brand claim',description='; '.join(reasons),severity='warning',points=bs))
+        if result:
+            for reason in result.reasons:factors.append(FactorDetail(category='URL structure',name=result.domain,description=reason,severity='warning',points=result.lexical_score))
+        score,level,breakdown=compute_composite_risk(text_prob=ml_prob or 0,linguistic_score=ling,url_score=result.lexical_score if result else None,brand_score=bs,has_critical_credential_harvesting=any(f.category=='Credential Harvesting' for f in factors))
+        if not req.text and result:
+            score=max(score,round(100*(0.65*result.lexical_score+0.35*bs)))
+            level='CRITICAL' if score>=70 else 'SUSPICIOUS' if score>=30 else 'SAFE'
+        assessments.append((score,level,brand if bs>0 else None,result,breakdown))
+    score,level,brand,primary,breakdown=max(assessments,key=lambda r:r[0])
+    summary={'SAFE':'Few configured risk indicators detected. This does not verify the sender or website.','SUSPICIOUS':'Some suspicious indicators were detected. Verify the request independently.','CRITICAL':'Multiple strong risk indicators were detected. Avoid interacting until independently verified.'}[level]
+    return {'id':str(uuid.uuid4()),'timestamp':datetime.now(timezone.utc).isoformat(),'channel':req.channel,'input_text':req.text,'input_url':req.url,'risk_score':score,'risk_level':level,'is_phishing':level=='CRITICAL','summary':summary,'recommended_action':'Use the organisation’s independently verified official app or contact channel. Do not provide passwords, OTPs or payments through an unverified request.','factors':[f.model_dump() for f in factors],'triggers':[t.model_dump() for t in triggers],'url_analysis':primary.model_dump() if primary else None,'url_analyses':[u.model_dump() for u in urls],'brand_impersonation':brand,'ml_confidence':ml_prob,'ml_metadata':ml_meta,'score_breakdown':breakdown,'interstitial_warning_needed':bool(urls),'limitations':['Submitted-content analysis only. Websites were not visited.','Live reputation and VM inspection are not enabled.','The bundled text model is a small baseline without measured accuracy.']}
+@app.post('/api/analyze')
+def analyze(req:AnalyzeRequest,key=Depends(workspace)):
+    limit_requests(key)
+    previous=db.existing(key,req.request_id)
+    if previous:
+        if any(previous.get(k)!=v for k,v in [('input_text',req.text),('input_url',req.url),('channel',req.channel)]):raise HTTPException(409,'Request ID was already used for different content')
+        return previous
+    report=db.save_case(key,req.request_id,evaluate(req))
+    if any(report.get(k)!=v for k,v in [('input_text',req.text),('input_url',req.url),('channel',req.channel)]):raise HTTPException(409,'Request ID was already used for different content')
+    return report
+@app.get('/api/history')
+def history(query:str=Query('',max_length=200),risk_level:Literal['ALL','SAFE','SUSPICIOUS','CRITICAL']='ALL',channel:Literal['all','sms','email','social','url']='all',limit:int=Query(20,ge=1,le=100),offset:int=Query(0,ge=0),key=Depends(workspace)):
+    return db.history(key,query,risk_level,channel,limit,offset)
+@app.get('/api/history/{case_id}')
+def case(case_id:uuid.UUID,key=Depends(workspace)):
+    r=db.get_case(key,case_id)
+    if not r:raise HTTPException(404,'Case not found in this workspace')
+    return r
+@app.delete('/api/history/{case_id}')
+def delete(case_id:uuid.UUID,key=Depends(workspace)):
+    if not db.delete_case(key,case_id):raise HTTPException(404,'Case not found in this workspace')
+    return {'deleted':True}
+@app.get('/api/dashboard/stats')
+def stats(key=Depends(workspace)):return db.metrics(key)
+static=Path(__file__).resolve().parents[2]/'frontend'/'dist'
+if static.is_dir():app.mount('/',StaticFiles(directory=static,html=True),name='frontend')

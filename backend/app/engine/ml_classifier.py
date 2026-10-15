@@ -1,7 +1,7 @@
 """
 Machine Learning Text Classification Module (Salloum et al. 2022).
 Implements TF-IDF vectorization and Logistic Regression classifier.
-Provides deterministic, sub-millisecond inference and calibrated probability scores.
+Provides baseline text probability estimates without a calibration claim.
 """
 
 import os
@@ -25,6 +25,7 @@ class MLPhishingClassifier:
         data_path = os.path.join(os.path.dirname(__file__), "..", "data", "seed_corpus.json")
         model_cache_path = os.path.join(os.path.dirname(__file__), "..", "data", "cached_model.joblib")
 
+        # Training data is retained for the baseline classifier, not displayed as user history.
         # Try to load existing model
         if os.path.exists(model_cache_path):
             try:
@@ -67,7 +68,7 @@ class MLPhishingClassifier:
         Returns (phishing_probability [0.0 - 1.0], explanation_metadata)
         """
         if not self.model:
-            return 0.5, {"status": "model_uninitialized"}
+            raise RuntimeError("Text classifier is unavailable")
 
         try:
             # Predict probabilities [P(legit), P(phishing)]
@@ -98,7 +99,7 @@ class MLPhishingClassifier:
             }
         except Exception as e:
             logger.error(f"Inference error: {e}")
-            return 0.5, {"error": str(e)}
+            raise RuntimeError("Text classifier inference failed") from e
 
 # Singleton instance
 classifier_instance = MLPhishingClassifier()

@@ -102,9 +102,14 @@ def analyze_linguistic_patterns(text: str) -> Tuple[float, List[TriggerSpan], Li
             points=pts
         ))
 
+    credential_text = list(text)
+    for disclaimer in GENUINE_SAFETY_DISCLAIMER_PATTERN.finditer(text):
+        credential_text[disclaimer.start():disclaimer.end()] = ' ' * (disclaimer.end()-disclaimer.start())
+    credential_text = ''.join(credential_text)
+
     # 4. Scan Credential & Sensitive Harvesting
     for pattern in CREDENTIAL_HARVESTING_PATTERNS:
-        for match in re.finditer(pattern, text, re.IGNORECASE):
+        for match in re.finditer(pattern, credential_text, re.IGNORECASE):
             credential_hits += 1
             triggers.append(TriggerSpan(
                 text=match.group(0),
@@ -118,7 +123,7 @@ def analyze_linguistic_patterns(text: str) -> Tuple[float, List[TriggerSpan], Li
     has_academic = bool(BENIGN_ACADEMIC_PATTERN.search(text))
 
     if credential_hits > 0:
-        if has_disclaimer:
+        if has_disclaimer and not re.search(r"\b(enter|submit|send|provide|share|verify|update|login)\b", GENUINE_SAFETY_DISCLAIMER_PATTERN.sub("", text), re.I):
             # Genuine security advice included by bank
             factors.append(FactorDetail(
                 category="Security Warning Included",

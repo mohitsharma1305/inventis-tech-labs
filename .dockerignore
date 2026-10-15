@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/dist
+**/__pycache__
+**/*.db
+**/cached_model.joblib
+Models-trained
+.agents
+.env*
+tests
+research_papers

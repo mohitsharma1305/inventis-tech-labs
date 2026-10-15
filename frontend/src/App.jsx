@@ -1,186 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import DynamicRadarCard from './components/DynamicRadarCard';
-import BenchmarkSelector from './components/BenchmarkSelector';
+import './live.css';
+import React,{useState,useEffect} from 'react';
 import Scanner from './components/Scanner';
 import AnalysisResult from './components/AnalysisResult';
-import BottomGrid from './components/BottomGrid';
-import InterstitialModal from './components/InterstitialModal';
 import CaseHistory from './components/CaseHistory';
 import Dashboard from './components/Dashboard';
-import AcademicDocs from './components/AcademicDocs';
-import { checkBackendHealth, analyzeContent, fetchBenchmarks } from './api/client';
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('analyze');
-  const [backendStatus, setBackendStatus] = useState(null);
-  const [benchmarks, setBenchmarks] = useState([]);
-  const [presetIndex, setPresetIndex] = useState(0);
-
-  // Scanner state
-  const [inputText, setInputText] = useState('');
-  const [inputUrl, setInputUrl] = useState('');
-  const [channel, setChannel] = useState('sms');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState(null);
-
-  // Pre-interaction modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    checkBackendHealth().then((status) => setBackendStatus(status));
-    fetchBenchmarks().then((data) => {
-      setBenchmarks(data);
-      if (data && data.length > 0) {
-        setInputText(data[0].sample_text);
-        setInputUrl(data[0].sample_url || '');
-        setChannel(data[0].channel);
-        // Pre-run analysis so dashboard has data, but DO NOT auto-open popup on start
-        handleRunAnalysis(data[0].sample_text, data[0].sample_url || '', data[0].channel, false);
-      }
-    });
-  }, []);
-
-  const handleRunAnalysis = async (customText, customUrl, customChannel) => {
-    const textToScan = customText !== undefined ? customText : inputText;
-    const urlToScan = customUrl !== undefined ? customUrl : inputUrl;
-    const chanToScan = customChannel !== undefined ? customChannel : channel;
-
-    if (!textToScan.trim() && !urlToScan.trim()) return;
-
-    setIsAnalyzing(true);
-    try {
-      const res = await analyzeContent({
-        text: textToScan,
-        url: urlToScan || null,
-        channel: chanToScan
-      });
-      setResult(res);
-      // NOTE: Do NOT auto-open modal on scans or presets. 
-      // The modal only opens when the user explicitly clicks "Simulate Link Intercept".
-    } catch (err) {
-      console.error('Analysis failed:', err);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const handleSelectBenchmark = (bench) => {
-    setInputText(bench.sample_text);
-    setInputUrl(bench.sample_url || '');
-    setChannel(bench.channel);
-    setActiveTab('analyze');
-    // Execute analysis smoothly without popping up any modal
-    handleRunAnalysis(bench.sample_text, bench.sample_url || '', bench.channel);
-  };
-
-  const handleQuickPreset = () => {
-    if (!benchmarks || benchmarks.length === 0) return;
-    const nextIdx = (presetIndex + 1) % benchmarks.length;
-    setPresetIndex(nextIdx);
-    handleSelectBenchmark(benchmarks[nextIdx]);
-  };
-
-  const handleSelectCaseFromHistory = (historyRow) => {
-    setInputText(historyRow.preview);
-    setInputUrl(historyRow.url || '');
-    setChannel(historyRow.channel);
-    setActiveTab('analyze');
-    handleRunAnalysis(historyRow.preview, historyRow.url || '', historyRow.channel);
-  };
-
-  return (
-    <div className="app-container">
-      {/* Top Navbar Matching Screenshot */}
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        backendStatus={backendStatus}
-        onQuickPreset={handleQuickPreset}
-      />
-
-      {/* Main Tab Routing */}
-      {activeTab === 'analyze' && (
-        <>
-          {/* Flagship Dynamic Radar Cockpit (Matching Dark Hero Card in Screenshot) */}
-          <DynamicRadarCard
-            result={result}
-            totalScans={65}
-            criticalCount={3}
-            suspiciousCount={2}
-            safeCount={5}
-            onOpenInterstitial={() => setIsModalOpen(true)}
-            onSelectBenchmark={handleSelectBenchmark}
-            benchmarks={benchmarks}
-          />
-
-          {/* 1-Click Demonstration Scenarios Presets Bar */}
-          <BenchmarkSelector
-            benchmarks={benchmarks}
-            onSelectBenchmark={handleSelectBenchmark}
-          />
-
-          {/* Scanner Console & XAI Intelligence View */}
-          <div className="scanner-grid">
-            <Scanner
-              inputText={inputText}
-              setInputText={setInputText}
-              inputUrl={inputUrl}
-              setInputUrl={setInputUrl}
-              channel={channel}
-              setChannel={setChannel}
-              isAnalyzing={isAnalyzing}
-              onAnalyze={() => handleRunAnalysis()}
-              triggers={result?.triggers}
-            />
-
-            <AnalysisResult
-              result={result}
-              onOpenInterstitial={() => setIsModalOpen(true)}
-            />
-          </div>
-
-          {/* 4 Bottom Sage Cards & Timeline Strip (Matching Bottom Grid in Screenshot) */}
-          <BottomGrid
-            onOpenTimeline={() => setActiveTab('history')}
-            onTriggerAutomation={() => handleQuickPreset()}
-          />
-        </>
-      )}
-
-      {activeTab === 'history' && (
-        <>
-          <CaseHistory onSelectCase={handleSelectCaseFromHistory} />
-          <BottomGrid
-            onOpenTimeline={() => setActiveTab('history')}
-            onTriggerAutomation={() => handleQuickPreset()}
-          />
-        </>
-      )}
-
-      {activeTab === 'dashboard' && (
-        <>
-          <DynamicRadarCard
-            result={result}
-            onOpenInterstitial={() => setIsModalOpen(true)}
-          />
-          <Dashboard />
-          <BottomGrid
-            onOpenTimeline={() => setActiveTab('history')}
-            onTriggerAutomation={() => handleQuickPreset()}
-          />
-        </>
-      )}
-
-
-
-
-      {/* Pre-Interaction Protective Modal (SKIT025 Interstitial Shield) */}
-      <InterstitialModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        result={result}
-      />
-    </div>
-  );
+import {analyzeContent,checkBackendHealth,fetchCase} from './api/client';
+export default function App(){
+ const [tab,setTab]=useState('analyze'),[text,setText]=useState(''),[url,setUrl]=useState(''),[channel,setChannel]=useState('sms'),[result,setResult]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[health,setHealth]=useState(null),[revision,setRevision]=useState(0),[warning,setWarning]=useState(null),[pending,setPending]=useState(null);
+ useEffect(()=>{checkBackendHealth().then(setHealth).catch(()=>setHealth({status:'offline'}))},[]);
+ const changeText=v=>{setText(v);setResult(null);setPending(null)},changeUrl=v=>{setUrl(v);setResult(null);setPending(null)};
+ async function run(){setBusy(true);setError('');setResult(null);const payload=pending||{text,url:url||null,channel,request_id:crypto.randomUUID()};setPending(payload);try{setResult(await analyzeContent(payload));setPending(null);setRevision(x=>x+1);setHealth({status:'online'})}catch(e){setError(e.message)}finally{setBusy(false)}}
+ async function open(row){setError('');try{const r=await fetchCase(row.id);setText(r.input_text);setUrl(r.input_url||'');setChannel(r.channel);setResult(r);setTab('analyze')}catch(e){setError(e.message)}}
+ return <div className="app-container"><nav className="cyberguard-navbar"><button className="brand-home" onClick={()=>setTab('analyze')}><strong>INVENTIS</strong></button><div className="center-nav-pills">{[['analyze','Threat scanner'],['history','Case history'],['dashboard','Dashboard'],['guide','How it works']].map(([key,label])=><button key={key} className={'nav-pill-btn '+(tab===key?'active':'')} onClick={()=>{setTab(key);setError('')}}>{label}</button>)}</div></nav>
+ <header className="live-hero"><span className="eyebrow">TEAM 26 / TECH LABS</span><h1>Understand the risk before you respond.</h1><p>Analyse submitted messages and links. Get evidence, an explained risk score and practical next steps.</p><div className="service-status">API: {health?health.status:'checking'} · PostgreSQL history · Private browser workspace</div></header>
+ {error&&<div role="alert" className="error-banner">{error}</div>}
+ {tab==='analyze'&&<><p className="scope-note">Analysis uses a small baseline text model and configured rules. Live reputation and VM inspection are not enabled. Do not paste real passwords or OTPs.</p><div className="scanner-grid"><Scanner inputText={text} setInputText={changeText} inputUrl={url} setInputUrl={changeUrl} channel={channel} setChannel={v=>{setChannel(v);setPending(null);setResult(null)}} isAnalyzing={busy} onAnalyze={run} triggers={result?.triggers}/><AnalysisResult result={result} onOpenInterstitial={setWarning}/></div></>}
+ {tab==='history'&&<CaseHistory onSelectCase={open} onChanged={()=>setRevision(x=>x+1)}/>}{tab==='dashboard'&&<Dashboard revision={revision}/>}
+ {tab==='guide'&&<section className="glass-panel guide"><h2>What this analysis can tell you</h2><p>Your message passes through linguistic rules and a TF-IDF + Logistic Regression classifier. Every detected URL is checked for structural indicators and brand-domain mismatch. The highest per-link assessment determines the report score.</p><h3>What the score means</h3><p>0–29: low detected risk. 30–69: suspicious indicators. 70–100: strong risk indicators. These configured thresholds are not measured probabilities of harm.</p><h3>Privacy and history</h3><p>Reports are saved in PostgreSQL under a random token in this browser. Other browser workspaces cannot list your cases. This is not an account or multi-device login. Clearing browser storage loses access. You can export and delete reports.</p><h3>Detection limits</h3><p>The text model uses 20 labelled examples and has no measured accuracy claim. Links are not visited, downloads are not executed, and no VM is connected. A low score never guarantees safety.</p></section>}
+ {warning&&<div className="modal-overlay" onClick={()=>setWarning(null)}><section role="dialog" aria-modal="true" aria-label="External link warning" className="link-warning" onClick={e=>e.stopPropagation()}><h2>Review before opening</h2><p>Inventis has not verified this destination or inspected its live content. Opening it leaves this application.</p><code>{warning}</code><div className="actions"><button onClick={()=>setWarning(null)}>Stay in Inventis</button><a className="secondary-link" href={warning} target="_blank" rel="noopener noreferrer" onClick={()=>setWarning(null)}>Open destination</a></div></section></div>}
+ <footer className="app-footer">Reports reflect detected indicators, not a guarantee of safety. Saved history belongs to this browser workspace.</footer></div>
 }

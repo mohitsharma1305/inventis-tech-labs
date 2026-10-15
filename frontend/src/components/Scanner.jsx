@@ -31,6 +31,7 @@ export default function Scanner({
         );
       }
 
+      if (trig.start < lastIdx) return;
       // Highlighted trigger chip
       let className = 'hl-urgency';
       if (trig.category === 'coercion') className = 'hl-coercion';
@@ -194,7 +195,7 @@ export default function Scanner({
           )}
         </button>
 
-        {inputText && (
+        {(inputText || inputUrl) && (
           <button
             id="clear-input-btn"
             style={{

@@ -3,10 +3,12 @@ URL & Domain Analysis Engine based on Sahoo et al. (2017).
 Extracts lexical, structural, entropy, and domain-reputation indicators.
 """
 
+import ipaddress
 import math
 import re
 from urllib.parse import urlparse
 from typing import Tuple, List, Optional
+from .url_validation import normalize_url
 from ..config import SUSPICIOUS_TLDS, KNOWN_URL_SHORTENERS
 from ..models.schemas import UrlAnalysisResult
 
@@ -40,11 +42,9 @@ def analyze_url(url_str: str) -> UrlAnalysisResult:
     Performs comprehensive lexical and infrastructure analysis of a URL.
     Returns structured analysis with risk score component [0.0 - 1.0].
     """
-    if not url_str.startswith("http://") and not url_str.startswith("https://"):
-        url_str = "http://" + url_str
-
+    url_str = normalize_url(url_str)
     parsed = urlparse(url_str)
-    netloc = (parsed.netloc or "").lower().split(":")[0]  # remove port if present
+    netloc = (parsed.hostname or '').lower()
     path = parsed.path or ""
     full_target = url_str.lower()
 
@@ -52,7 +52,11 @@ def analyze_url(url_str: str) -> UrlAnalysisResult:
     lexical_score = 0.0
 
     # 1. IP address as Host Check (Major Phishing Indicator)
-    is_ip = bool(IPV4_PATTERN.match(netloc))
+    try:
+        ipaddress.ip_address(netloc)
+        is_ip = True
+    except ValueError:
+        is_ip = False
     if is_ip:
         lexical_score += 0.45
         reasons.append("Host is a direct raw IP address rather than a verified domain name")
@@ -69,7 +73,7 @@ def analyze_url(url_str: str) -> UrlAnalysisResult:
     suspicious_tld = tld in SUSPICIOUS_TLDS
     if suspicious_tld:
         lexical_score += 0.35
-        reasons.append(f"Uses high-risk/disposable Top-Level Domain (.{tld}) commonly used in malicious campaigns")
+        reasons.append(f"Uses a configured risk-indicator Top-Level Domain (.{tld}) (this alone does not establish maliciousness)")
 
     # 4. Subdomain nesting / obfuscation
     subdomain_count = max(0, len(domain_parts) - 2)
@@ -92,7 +96,7 @@ def analyze_url(url_str: str) -> UrlAnalysisResult:
         lexical_score += 0.25
         reasons.append("Multiple redirection slashes ('//') detected in path")
 
-    if full_target.count("-") >= 3:
+    if netloc.count("-") >= 3:
         lexical_score += 0.15
         reasons.append("Multiple hyphens in hostname mimicking authentic service names")
 
