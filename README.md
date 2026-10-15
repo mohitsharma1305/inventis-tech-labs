@@ -28,9 +28,10 @@ Case endpoints require X-Workspace-Token (64 lowercase hex characters). Request 
 ## Tests
 Use a separate PostgreSQL test database in DATABASE_URL, install pytest and httpx, then run `python -m pytest tests -q`. Tests create randomly scoped records and clean them up.
 
-## Deployment handoff
-The standard Dockerfile and railway.json are ready. The source has not yet been uploaded: the connected GitHub integration rejected writes. The existing main branch has not been changed. Connect this source to Railway after granting repository write/upload access. Set DATABASE_URL to the Railway Postgres reference. Never store the source bundle in environment variables.
+## Live deployment
+Live application: https://inventis-production.up.railway.app
+Railway deploys the `railway-real-data` branch with a connected PostgreSQL service. The original main branch remains unchanged.
 
-Validation: 25 focused engine/API tests pass. The frontend production build and dependency audit pass. Database persistence has not been integration-tested against the provisioned Railway PostgreSQL instance because no application deployment is live yet. The API tests simulate storage failure to verify a 503 rather than fabricated output.
+Validation: 31 focused engine/API tests pass, including regression coverage for generic-word brand false positives. The frontend production build and dependency audit pass. Browser checks cover empty initial state, explicit API failure without fabricated output, and all four views at 390 pixels. Live database verification is tracked separately; local API tests simulate storage failure.
 
-Browser checks passed for empty initial state, explicit API failure without fabricated reports/history/metrics, guide rendering, all four views at 390 pixels, and no uncaught browser errors. Full frontend dependency audit: zero reported vulnerabilities at verification time.
+Brand matching uses explicit aliases with word boundaries. An unmatched configured official-domain list is a warning, not proof that a site is malicious. Saved reports retain the assessment made at submission time; resubmit input to apply updated detection rules.

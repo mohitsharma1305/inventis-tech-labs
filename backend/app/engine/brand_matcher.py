@@ -8,6 +8,31 @@ import re
 from typing import Optional, Tuple, List
 from ..config import TARGET_BRANDS
 
+# Explicit aliases avoid treating generic words such as "board", "bank",
+# "India" or "office" as brand claims. Never match inside another word.
+BRAND_ALIASES = {
+    "State Bank of India (SBI)": ("state bank of india", "sbi"),
+    "HDFC Bank": ("hdfc",),
+    "ICICI Bank": ("icici",),
+    "Punjab National Bank (PNB)": ("punjab national bank", "pnb"),
+    "Paytm": ("paytm",),
+    "PhonePe": ("phonepe",),
+    "Google / Google Pay": ("google", "gpay"),
+    "SKIT Jaipur / Campus ERP": ("skit", "skit jaipur"),
+    "Electricity Board / Bijli Nigam": ("electricity board", "bijli nigam", "jvvnl", "bescom", "uppcl"),
+    "India Post": ("india post", "indiapost"),
+    "Income Tax Department": ("income tax", "incometax"),
+    "Amazon": ("amazon",),
+    "Telegram": ("telegram",),
+    "WhatsApp": ("whatsapp",),
+    "Microsoft / Office 365": ("microsoft", "office 365", "microsoft 365"),
+    "Apple": ("apple", "icloud"),
+}
+
+def mentions_alias(value: str, aliases) -> bool:
+    return any(re.search(r"(?<!\w)" + re.escape(alias).replace(r"\ ", r"\s+") + r"(?!\w)", value)
+               for alias in aliases)
+
 def levenshtein_distance(s1: str, s2: str) -> int:
     """Computes standard edit distance between two strings."""
     if len(s1) < len(s2):
@@ -40,11 +65,11 @@ def detect_brand_impersonation(text: str, domain: Optional[str] = None) -> Tuple
 
     for brand, legit_domains in TARGET_BRANDS.items():
         # Check brand name tokens in text
-        brand_tokens = [tok.lower() for tok in re.split(r"[\s/()]+", brand) if len(tok) >= 3]
-        brand_in_text = any(tok in text_lower for tok in brand_tokens)
+        aliases = BRAND_ALIASES.get(brand, (brand.lower(),))
+        brand_in_text = mentions_alias(text_lower, aliases)
 
         # Check brand name tokens in unverified domain
-        brand_in_domain = any(tok in domain_lower for tok in brand_tokens)
+        brand_in_domain = mentions_alias(domain_lower.replace('-', ' '), aliases)
 
         if brand_in_text or brand_in_domain:
             matched_brand = brand
@@ -60,7 +85,7 @@ def detect_brand_impersonation(text: str, domain: Optional[str] = None) -> Tuple
                     # Brand mentioned, but destination domain is NOT authorized
                     max_impersonation_score = 0.85
                     reasons.append(
-                        f"Message references '{brand}', but link points to unauthorized domain '{domain_lower}'"
+                        f"Detected a reference to '{brand}', but '{domain_lower}' is not in its configured official-domain list. This mismatch alone does not establish maliciousness."
                     )
 
                     # Check for typosquatting / lookalike domain

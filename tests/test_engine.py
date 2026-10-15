@@ -40,3 +40,21 @@ def test_no_fake_safety_claim():
     assert 0<=r['risk_score']<=100
     assert 'does not verify' in r['summary']
     assert 'not enabled' in ' '.join(r['limitations'])
+
+@pytest.mark.parametrize('text',[
+    'Congratulations! Amazon internship onboarding is complete.',
+    'The board reviewed your application for the workshop.',
+    'The office in India has confirmed your application.',
+])
+def test_no_generic_brand_false_positive(text):
+    from backend.app.engine.brand_matcher import detect_brand_impersonation
+    brand,score,reasons=detect_brand_impersonation(text,'workshop-try.com')
+    assert brand == ('Amazon' if 'Amazon' in text else None)
+    assert not any('Bijli' in reason for reason in reasons)
+
+@pytest.mark.parametrize('name',['Electricity Board','Bijli Nigam','JVVNL'])
+def test_explicit_electricity_brand(name):
+    from backend.app.engine.brand_matcher import detect_brand_impersonation
+    brand,score,reasons=detect_brand_impersonation(name+' requests payment','unverified.example')
+    assert brand=='Electricity Board / Bijli Nigam'
+    assert score>0
